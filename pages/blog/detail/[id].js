@@ -4,6 +4,7 @@ import { getDatabase, getPage, getBlocks } from "../../../lib/notion";
 import Link from "next/link";
 import { databaseId } from "../../index.js";
 import styles from "../../post.module.css";
+import Layout from "../../../components/layout"
 
 export const Text = ({ text }) => {
   if (!text) {
@@ -58,19 +59,19 @@ const renderBlock = (block) => {
       );
     case "heading_1":
       return (
-        <h1>
+        <h1 className="display-3">
           <Text text={value.rich_text} />
         </h1>
       );
     case "heading_2":
       return (
-        <h2>
+        <h2 className="display-4">
           <Text text={value.rich_text} />
         </h2>
       );
     case "heading_3":
       return (
-        <h3>
+        <h3 className="display-6">
           <Text text={value.rich_text} />
         </h3>
       );
@@ -121,7 +122,7 @@ const renderBlock = (block) => {
       const caption = value.caption ? value.caption[0]?.plain_text : "";
       return (
         <figure>
-          <img src={src} alt={caption} />
+          <img src={src} alt={caption} style={{width : '100%'}}/>
           {caption && <figcaption>{caption}</figcaption>}
         </figure>
       );
@@ -201,31 +202,112 @@ const renderBlock = (block) => {
   }
 };
 
-export default function Post({ page, blocks }) {
+export default function Post({ page, blocks, tagList }) {
   if (!page || !blocks) {
     return <div />;
   }
+  let pageTitle = ""
+  for(const t of page.properties.Name.title){
+    pageTitle += t.plain_text
+  }
+
+  const createtDate = new Date(page.created_time).toLocaleString(
+    "ja",
+    {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    }
+  );
+  const lastEditDate = new Date(page.last_edited_time).toLocaleString(
+    "ja",
+    {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    }
+  );
+
+  const adIndex = Math.ceil(blocks.length/2)
   return (
-    <div>
+    <Layout>
       <Head>
-        <title>{page.properties.Name.title[0].plain_text}</title>
+        <title>{pageTitle}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <article className={styles.container}>
-        <h1 className={styles.name}>
-          <Text text={page.properties.Name.title} />
-        </h1>
-        <section>
-          {blocks.map((block) => (
-            <Fragment key={block.id}>{renderBlock(block)}</Fragment>
-          ))}
-          <Link href="/" className={styles.back}>
-            ← Go home
-          </Link>
-        </section>
-      </article>
-    </div>
+      <div className="container mt-5">
+            <div className="row">
+                <div className="col-lg-8">
+                    {/* Post content*/}
+                    <article>
+                        <header className="mb-4">
+                            <h1 className="fw-bolder mb-1">{pageTitle}</h1>
+                            <div className="text-muted fst-italic mb-2">
+                              <strong>作成日</strong> {createtDate} / 更新日 {lastEditDate}
+                            </div>
+                            {page.properties.Tags.multi_select.map((tag) => {
+                              return (
+                                <Link href={`/blog/?tag=${tag.name}`} className="bi-star-fill btn btn-outline-secondary m-1"  key={tag.id}>{tag.name}</Link>
+                              )
+                            })}
+                        </header>
+                        <p>広告</p>
+                        {/* <figure className="mb-4"><img className="img-fluid rounded" src="https://dummyimage.com/900x400/ced4da/6c757d.jpg" alt="..." /></figure> */}
+                        {/* Post content*/}
+                        {blocks.map((block, index) => {
+                          if(adIndex == index){
+                            return (
+                              <Fragment key={block.id}><div style={{color: 'red'}}>記事内広告</div>{renderBlock(block)}</Fragment>
+                            )
+                          } else {
+                            return (
+                              <Fragment key={block.id}>{renderBlock(block)}</Fragment>
+                            )
+                          }
+                          
+                          })}
+                    </article>
+                    <Link href="/" className={styles.back}>← Go home</Link>
+                </div>
+                {/* Side widgets*/}
+                <div className="col-lg-4">
+                    {/* Search widget*/}
+                    <div className="card mb-4">
+                        <div className="card-header bg-dark text-white">Search</div>
+                        <div className="card-body">
+                            <div className="input-group">
+                                <input className="form-control" type="text" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
+                                <button className="btn btn-primary" id="button-search" type="button">Go!</button>
+                            </div>
+                        </div>
+                    </div>
+                    {/* Categories widget*/}
+                    <div className="card mb-4">
+                        <div className="card-header  bg-dark text-white">Categories</div>
+                        <div className="card-body">
+                            <div className="row">
+                                <div className="container">
+                                    <div className="row">
+                                      {tagList.map((tag) => {
+                                        return (
+                                          <div className="col-3" style={{width:'fit-content'}}><Link href={`/blog/?tag=${tag}`} className="col bi-star-fill btn btn-outline-secondary m-1"  key={tag}>{tag}</Link></div>
+                                        )
+                                      })}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {/* Side widget*/}
+                    <div className="card mb-4">
+                        <div className="card-header  bg-dark text-white">Side Widget</div>
+                        <div className="card-body">You can put anything you want inside of these side widgets. They are easy to use, and feature the Bootstrap 5 card component!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </Layout>
   );
 }
 
@@ -239,6 +321,20 @@ export const getStaticPaths = async () => {
 
 export const getStaticProps = async (context) => {
   const { id } = context.params;
+  const database = await getDatabase(databaseId);
+  let tagList = []
+  
+  for(const item of database) {
+    if(!item){
+      continue
+    }
+    item.properties.Tags.multi_select.map((tag) => {
+      if(tagList.indexOf(tag.name) < 0){
+        tagList.push(tag.name)
+      }
+    })
+  }
+
   const page = await getPage(id);
   const blocks = await getBlocks(id);
 
@@ -246,6 +342,7 @@ export const getStaticProps = async (context) => {
     props: {
       page,
       blocks,
+      tagList
     },
     revalidate: 1,
   };

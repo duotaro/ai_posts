@@ -22,7 +22,6 @@ export default function Blog({ posts }) {
     //const query = router.query;
 
     useEffect(() => {
-      console.log(router)
       if(router.isReady) console.log(router.query);
     },[router]);
 
@@ -67,13 +66,13 @@ export default function Blog({ posts }) {
   );
 }
 
-export const getStaticProps = async () => {
-  const database = await getDatabase(databaseId);
+// export const getStaticProps = async () => {
+//   const database = await getDatabase(databaseId);
 
-  return {
-    props: {
-      posts: database,
-    },
-    revalidate: 1,
-  };
-};
+//   return {
+//     props: {
+//       posts: database,
+//     },
+//     revalidate: 1,
+//   };
+// };

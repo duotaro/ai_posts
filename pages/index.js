@@ -3,12 +3,10 @@ import Link from "next/link";
 import { Text } from "./blog/detail/[id].js"
 import { getDatabase } from "../lib/notion";
 import Layout from '../components/layout'
-
 export const databaseId = process.env.NEXT_PUBLIC_NOTION_DATABASE_ID;
-console.log("▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲")
-console.log(databaseId)
-console.log("▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲")
+
 export default function Home({ posts }) {
+
   return (
     <Layout>
       <Head>
@@ -70,10 +68,9 @@ export default function Home({ posts }) {
 
 export const getStaticProps = async () => {
   const database = await getDatabase(databaseId);
-
   return {
     props: {
-      posts: database,
+      posts: database
     },
     revalidate: 1,
   };

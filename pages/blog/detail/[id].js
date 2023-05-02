@@ -258,7 +258,10 @@ export default function Post({ page, blocks, tagList }) {
                         {blocks.map((block, index) => {
                           if(adIndex == index){
                             return (
-                              <Fragment key={block.id}><div style={{color: 'red'}}>記事内広告</div>{renderBlock(block)}</Fragment>
+                              <Fragment key={block.id}>
+                                {/* 広告 */}
+                                {renderBlock(block)}
+                              </Fragment>
                             )
                           } else {
                             return (

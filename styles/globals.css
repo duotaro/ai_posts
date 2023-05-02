@@ -3677,6 +3677,7 @@ textarea.form-control-lg {
   color: var(--bs-nav-link-color);
   text-decoration: none;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+  white-space: nowrap;
 }
 @media (prefers-reduced-motion: reduce) {
   .nav-link {
@@ -10877,3 +10878,33 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+
+.gnav {
+  flex-direction: column;
+}
+
+.img-responsive {
+  display: block;
+  height: auto;
+  max-height: 250px;
+}
+
+@media (min-width: 576px) {
+  .img-responsive {
+    min-height: 170px;
+    max-height: 220px;
+  }
+}
+@media (min-width: 768px) {
+  .img-responsive {
+    min-height: 230px;
+    max-height: 230px;
+  }
+}
+@media (min-width: 992px) {
+  .img-responsive {
+    min-height: 220px;
+    max-height: 220px;
+  }
+}
+

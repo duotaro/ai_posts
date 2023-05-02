@@ -1,26 +1,11 @@
 import Head from "next/head";
 import Link from "next/link";
 import { Text } from "./blog/detail/[id].js"
-import { getDatabase } from "../lib/notion";
-import Layout from '../components/layout'
+import { getDatabase } from "../lib/notion.js";
+import Layout from '../components/layout.js'
 export const databaseId = process.env.NEXT_PUBLIC_NOTION_DATABASE_ID;
 
-export default function Home({ posts }) {
-
-
-  let tagList = []
-  
-  for(const item of posts) {
-    if(!item){
-      continue
-    }
-    item.properties.Tags.multi_select.map((tag) => {
-      if(tagList.indexOf(tag.name) < 0){
-        tagList.push(tag.name)
-      }
-    })
-  }
-
+export default function Tags({ posts, tagList }) {
 
   return (
     <Layout>
@@ -77,20 +62,22 @@ export default function Home({ posts }) {
                 <div className="card-body">
                     <div className="input-group">
                         <input className="form-control" type="text" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
-                        <button className="btn btn-primary" id="button-search" type="button" >Go!</button>
+                        <button className="btn btn-primary" id="button-search" type="button">Go!</button>
                     </div>
                 </div>
             </div>
             {/* Categories widget*/}
             <div className="card mb-4">
-              <div className="card-header  bg-dark text-white">AI Categories</div>
+              <div className="card-header  bg-dark text-white">Categories</div>
               <div className="card-body">
                   <div className="row">
                       <div className="container">
                           <div className="row">
                             {tagList.map((tag) => {
                               return (
-                                <div className="col-3" style={{width:'fit-content'}} key={tag}><Link href={`/blog/?tag=${tag}`} className="col bi-star-fill btn btn-outline-secondary m-1" >{tag}</Link></div>
+                                <div className="col-3" style={{width:'fit-content'}} key={tag}>
+                                  <Link href={`/${tag}/`} className="col bi-star-fill btn btn-outline-secondary m-1" >{tag}</Link>
+                                </div>
                               )
                             })}
                           </div>
@@ -110,12 +97,63 @@ export default function Home({ posts }) {
   );
 }
 
-
-export const getStaticProps = async () => {
+export const getStaticPaths = async () => {
   const database = await getDatabase(databaseId);
+  let tagList = []
+  
+  for(const item of database) {
+    if(!item){
+      continue
+    }
+    item.properties.Tags.multi_select.map((tag) => {
+      if(tagList.indexOf(tag.name) < 0){
+        tagList.push(tag.name)
+      }
+    })
+  }
+
+  return {
+    paths: tagList.map((tag) => ({ params: { name:  tag } })),
+    fallback: false,
+  };
+};
+
+
+export const getStaticProps = async (context) => {
+  const { name } = context.params;
+  const database = await getDatabase(databaseId);
+  let tagList = []
+  
+  for(const item of database) {
+    if(!item){
+      continue
+    }
+    item.properties.Tags.multi_select.map((tag) => {
+      if(tagList.indexOf(tag.name) < 0){
+        tagList.push(tag.name)
+      }
+    })
+  }
+
+  let posts = []
+
+  database.map(p => {
+    let match = false
+    p.properties.Tags.multi_select.map(tag => {
+      if(tag.name == name) {
+        match = true
+        return false;
+      }
+    })
+    if(match){
+      posts.push(p)
+    }
+  })
+
   return {
     props: {
-      posts: database
+      posts: posts,
+      tagList: tagList
     },
     revalidate: 1,
   };

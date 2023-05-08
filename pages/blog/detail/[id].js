@@ -311,7 +311,7 @@ export default function Post({ page, blocks, tagList }) {
                                     <div className="row">
                                       {tagList.map((tag) => {
                                         return (
-                                          <div className="col-3" style={{width:'fit-content'}}><Link href={`/blog/?tag=${tag}`} className="col bi-star-fill btn btn-outline-secondary m-1"  key={tag}>{tag}</Link></div>
+                                          <div className="col-3" style={{width:'fit-content'}}><Link href={`/${tag}/`} className="col bi-star-fill btn btn-outline-secondary m-1"  key={tag}>{tag}</Link></div>
                                         )
                                       })}
                                     </div>
@@ -335,7 +335,7 @@ export const getStaticPaths = async () => {
   const database = await getDatabase(databaseId);
   return {
     paths: database.map((page) => ({ params: { id: page.id } })),
-    fallback: true,
+    fallback: false,
   };
 };
 

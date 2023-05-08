@@ -5,6 +5,7 @@ import { getDatabase } from "../lib/notion.js";
 import Layout from '../components/layout.js'
 export const databaseId = process.env.NEXT_PUBLIC_NOTION_DATABASE_ID;
 
+
 export default function Tags({ posts, tagList }) {
 
   return (
@@ -33,7 +34,7 @@ export default function Tags({ posts, tagList }) {
                             <div className="card-body p-4">
                                 <div className="text-center">
                                     <h5 className="fw-bolder"><Text text={post.properties.Name.title} /></h5>
-                                    <div className="d-flex justify-content-center small text-warning mb-2">
+                                    <div className="flex-column justify-content-center small text-warning mb-2">
                                       {post.properties.Tags.multi_select.map((tag) => {
                                         return (
                                           <Link href={`/${tag.name}/`} className="bi-star-fill btn btn-outline-secondary m-1"  key={tag.id}>{tag.name}</Link>
@@ -70,19 +71,13 @@ export default function Tags({ posts, tagList }) {
             <div className="card mb-4">
               <div className="card-header  bg-dark text-white">Categories</div>
               <div className="card-body">
-                  <div className="row">
-                      <div className="container">
-                          <div className="row">
-                            {tagList.map((tag) => {
-                              return (
-                                <div className="col-3" style={{width:'fit-content'}} key={tag}>
-                                  <Link href={`/${tag}/`} className="col bi-star-fill btn btn-outline-secondary m-1" >{tag}</Link>
-                                </div>
-                              )
-                            })}
-                          </div>
-                      </div>
-                  </div>
+                <div className="flex-column justify-content-center small text-warning mb-2">
+                  {tagList.map((tag) => {
+                    return (
+                      <Link href={`/blog/?tag=${tag}`} className="col bi-star-fill btn btn-outline-secondary m-1" key={tag}>{tag}</Link>
+                    )
+                  })}
+                </div>
               </div>
             </div>
             {/* Side widget*/}

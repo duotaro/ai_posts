@@ -31,7 +31,7 @@ export default function Home({ posts }) {
       <div className="container mt-5">
         <div className="row">
           <section className="col-lg-8">
-            <div className="row gx-4 gx-lg-5 row-cols-sm-2 row-cols-1 justify-content-center">
+          <div className="row gx-4 gx-lg-5 row-cols-sm-2 row-cols-1 justify-content-center">
               {posts.map((post) => {
                 const date = new Date(post.last_edited_time).toLocaleString(
                   "ja",
@@ -42,16 +42,16 @@ export default function Home({ posts }) {
                   }
                 );
                 return (
-                    <div className="col-6 mb-5" key={post.id}>
+                    <div className="col mb-5" key={post.id}>
                         <div className="card h-100">
                             <img className="card-img-top border-bottom img-responsive" src={post.properties.Image.url} alt="..." />
                             <div className="card-body p-4">
                                 <div className="text-center">
                                     <h5 className="fw-bolder"><Text text={post.properties.Name.title} /></h5>
-                                    <div className="d-flex justify-content-center small text-warning mb-2">
+                                    <div className="flex-column justify-content-center small text-warning mb-2">
                                       {post.properties.Tags.multi_select.map((tag) => {
                                         return (
-                                          <Link href={`/${tag.name}/`} className="bi-star-fill btn btn-outline-secondary m-1"  key={tag.id}>{tag.name}</Link>
+                                          <Link href={`/${tag.name}/`} className="bi-star-fill btn btn-outline-secondary m-1" style={{whiteSpace: 'nowrap'}} key={tag.id}>{tag.name}</Link>
                                         )
                                       })}
                                     </div>
@@ -85,17 +85,13 @@ export default function Home({ posts }) {
             <div className="card mb-4">
               <div className="card-header  bg-dark text-white">AI Categories</div>
               <div className="card-body">
-                  <div className="row">
-                      <div className="container">
-                          <div className="row">
-                            {tagList.map((tag) => {
-                              return (
-                                <div className="col-3" style={{width:'fit-content'}} key={tag}><Link href={`/blog/?tag=${tag}`} className="col bi-star-fill btn btn-outline-secondary m-1" >{tag}</Link></div>
-                              )
-                            })}
-                          </div>
-                      </div>
-                  </div>
+                <div className="flex-column justify-content-center small text-warning mb-2">
+                  {tagList.map((tag) => {
+                    return (
+                      <Link href={`/blog/?tag=${tag}`} className="col bi-star-fill btn btn-outline-secondary m-1" key={tag}>{tag}</Link>
+                    )
+                  })}
+                </div>
               </div>
             </div>
             {/* Side widget*/}

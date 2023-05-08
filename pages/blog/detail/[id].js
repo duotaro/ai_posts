@@ -129,7 +129,11 @@ const renderBlock = (block) => {
     case "divider":
       return <hr key={id} />;
     case "quote":
-      return <blockquote key={id}>{value.rich_text[0].plain_text}</blockquote>;
+      let val = ''
+      value.rich_text.map(t => {
+        val += t.plain_text
+      })
+      return <blockquote key={id}>{val}</blockquote>;
     case "code":
       return (
         <pre className={styles.pre}>
@@ -195,6 +199,14 @@ const renderBlock = (block) => {
     case "column": {
       return <div>{block.children.map((child) => renderBlock(child))}</div>;
     }
+    case "embed": {
+      const url = value.url;
+      return (
+        <a href={url} target="_brank" className={styles.bookmark}>
+          {url}
+        </a>
+      );
+    }
     default:
       return `❌ Unsupported block (${
         type === "unsupported" ? "unsupported by Notion API" : type
@@ -228,6 +240,10 @@ export default function Post({ page, blocks, tagList }) {
     }
   );
 
+  // 
+  console.log(blocks)
+  
+
   const adIndex = Math.ceil(blocks.length/2)
   return (
     <Layout>
@@ -256,6 +272,7 @@ export default function Post({ page, blocks, tagList }) {
                         {/* <figure className="mb-4"><img className="img-fluid rounded" src="https://dummyimage.com/900x400/ced4da/6c757d.jpg" alt="..." /></figure> */}
                         {/* Post content*/}
                         {blocks.map((block, index) => {
+                          
                           if(adIndex == index){
                             return (
                               <Fragment key={block.id}>
